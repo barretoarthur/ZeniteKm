@@ -148,6 +148,8 @@ function renderSuggestions(cities, container, input) {
     });
 }
 
+let previewDebounce = null;
+
 function updateDistancePreview() {
     const traveler = document.getElementById("traveler-select").value;
     const dest = document.getElementById("destination-input").value.trim();
@@ -159,16 +161,32 @@ function updateDistancePreview() {
     }
 
     const user = USERS[traveler];
+
+    // Tenta buscar localmente primeiro (síncrono)
     const distOneWay = getRoadDistance(user.city, dest);
 
-    if (distOneWay === null) {
-        preview.classList.add("hidden");
+    if (distOneWay !== null) {
+        showDistancePreview(user.city, dest, distOneWay);
         return;
     }
 
+    // Se não encontrou, tenta assíncrono com debounce
+    clearTimeout(previewDebounce);
+    previewDebounce = setTimeout(async () => {
+        const asyncDist = await getRoadDistanceAsync(user.city, dest);
+        if (asyncDist !== null) {
+            showDistancePreview(user.city, dest, asyncDist);
+        } else {
+            preview.classList.add("hidden");
+        }
+    }, 500);
+}
+
+function showDistancePreview(origin, dest, distOneWay) {
+    const preview = document.getElementById("distance-preview");
     const distRound = distOneWay * 2;
 
-    document.getElementById("route-origin").textContent = user.city;
+    document.getElementById("route-origin").textContent = origin;
     document.getElementById("route-dest").textContent = dest;
     document.getElementById("dist-oneway").textContent = `${distOneWay} km`;
     document.getElementById("dist-return").textContent = `${distOneWay} km`;
@@ -177,18 +195,30 @@ function updateDistancePreview() {
     preview.classList.remove("hidden");
 }
 
-function handleFormSubmit() {
+async function handleFormSubmit() {
     const travelerId = document.getElementById("traveler-select").value;
     const date = document.getElementById("trip-date").value;
     const dest = document.getElementById("destination-input").value.trim();
+    const submitBtn = document.getElementById("btn-submit");
 
     if (!travelerId || !date || !dest) return;
 
     const user = USERS[travelerId];
-    const distOneWay = getRoadDistance(user.city, dest);
+
+    // Tenta síncrono primeiro
+    let distOneWay = getRoadDistance(user.city, dest);
+
+    // Se não encontrou, tenta assíncrono
+    if (distOneWay === null) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Calculando distância...";
+        distOneWay = await getRoadDistanceAsync(user.city, dest);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Viagem`;
+    }
 
     if (distOneWay === null) {
-        showToast("Cidade não encontrada na base de dados!", true);
+        showToast("Cidade não encontrada! Verifique o nome e tente novamente.", true);
         return;
     }
 
