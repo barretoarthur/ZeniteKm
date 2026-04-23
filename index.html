@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de controle de quilometragem dos Mestres Conselheiros Estaduais da Ordem DeMolay para o Estado de Sergipe - Gestão Zênite 2026/2027">
+    <title>Zênite KM Tracker | Ordem DeMolay - Sergipe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Animated Star Background -->
+    <div class="stars-bg" id="stars-bg"></div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-inner">
+            <div class="header-brand">
+                <img src="../Brasão.png" alt="Brasão Zênite" class="header-logo" id="header-logo">
+                <div class="header-text">
+                    <h1 class="header-title">Zênite KM Tracker</h1>
+                    <p class="header-subtitle">Gestão Estadual · Sergipe · 2026/2027</p>
+                </div>
+            </div>
+            <nav class="header-nav" id="header-nav">
+                <button class="nav-btn active" data-section="dashboard" id="nav-dashboard">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Dashboard
+                </button>
+                <button class="nav-btn" data-section="register" id="nav-register">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    Nova Viagem
+                </button>
+                <button class="nav-btn" data-section="history" id="nav-history">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+                    Histórico
+                </button>
+            </nav>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- ========== DASHBOARD SECTION ========== -->
+        <section class="section section-dashboard active" id="section-dashboard">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Painel de Controle
+                </h2>
+                <p class="section-desc">Quilometragem acumulada dos Mestres Conselheiros Estaduais</p>
+            </div>
+
+            <div class="dashboard-grid" id="dashboard-grid">
+                <!-- Alberto Card -->
+                <div class="user-card" id="card-alberto">
+                    <div class="card-glow"></div>
+                    <div class="card-header-strip"></div>
+                    <div class="card-content">
+                        <div class="card-profile">
+                            <div class="profile-img-wrapper">
+                                <img src="../Alberto.jpg" alt="Alberto" class="profile-img" id="img-alberto">
+                                <div class="profile-ring"></div>
+                            </div>
+                            <div class="profile-info">
+                                <h3 class="profile-name">Alberto</h3>
+                                <span class="profile-role">Mestre Conselheiro Estadual</span>
+                                <span class="profile-city">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Canindé de São Francisco
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div class="stat-km">
+                                <span class="stat-label">Total de Quilômetros</span>
+                                <div class="stat-counter">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                    <span class="counter-value" id="km-alberto">0</span>
+                                    <span class="counter-unit">km</span>
+                                </div>
+                            </div>
+                            <div class="stat-trips">
+                                <span class="stat-label">Viagens Realizadas</span>
+                                <span class="trips-value" id="trips-alberto">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arthur Vinícius Card -->
+                <div class="user-card" id="card-arthur">
+                    <div class="card-glow"></div>
+                    <div class="card-header-strip"></div>
+                    <div class="card-content">
+                        <div class="card-profile">
+                            <div class="profile-img-wrapper">
+                                <img src="../ArthurMCEA.jpg" alt="Arthur Vinícius" class="profile-img" id="img-arthur">
+                                <div class="profile-ring"></div>
+                            </div>
+                            <div class="profile-info">
+                                <h3 class="profile-name">Arthur Vinícius</h3>
+                                <span class="profile-role">Mestre Conselheiro Estadual Adjunto</span>
+                                <span class="profile-city">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Itabaiana
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-stats">
+                            <div class="stat-km">
+                                <span class="stat-label">Total de Quilômetros</span>
+                                <div class="stat-counter">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                    <span class="counter-value" id="km-arthur">0</span>
+                                    <span class="counter-unit">km</span>
+                                </div>
+                            </div>
+                            <div class="stat-trips">
+                                <span class="stat-label">Viagens Realizadas</span>
+                                <span class="trips-value" id="trips-arthur">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Combined Stats -->
+            <div class="combined-stats" id="combined-stats">
+                <div class="combined-stat">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    <div>
+                        <span class="combined-label">Total Geral</span>
+                        <span class="combined-value" id="total-km-combined">0 km</span>
+                    </div>
+                </div>
+                <div class="combined-stat">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <div>
+                        <span class="combined-label">Total de Viagens</span>
+                        <span class="combined-value" id="total-trips-combined">0</span>
+                    </div>
+                </div>
+                <div class="combined-stat">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <div>
+                        <span class="combined-label">Última Viagem</span>
+                        <span class="combined-value" id="last-trip-date">—</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== REGISTER SECTION ========== -->
+        <section class="section section-register" id="section-register">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                    Registrar Nova Viagem
+                </h2>
+                <p class="section-desc">Insira os dados da viagem para calcular a distância automaticamente</p>
+            </div>
+
+            <div class="form-container">
+                <form class="trip-form" id="trip-form">
+                    <div class="form-group">
+                        <label for="traveler-select" class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            Viajante
+                        </label>
+                        <div class="select-wrapper">
+                            <select id="traveler-select" required>
+                                <option value="">Selecione o viajante...</option>
+                                <option value="alberto">Alberto — Canindé de São Francisco</option>
+                                <option value="arthur">Arthur Vinícius — Itabaiana</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="trip-date" class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Data da Viagem
+                        </label>
+                        <input type="date" id="trip-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="destination-input" class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            Cidade de Destino
+                        </label>
+                        <div class="input-with-suggestions">
+                            <input type="text" id="destination-input" placeholder="Digite a cidade de destino..." required autocomplete="off">
+                            <div class="suggestions-dropdown" id="suggestions-dropdown"></div>
+                        </div>
+                    </div>
+
+                    <!-- Distance Preview -->
+                    <div class="distance-preview hidden" id="distance-preview">
+                        <div class="preview-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            Cálculo de Distância
+                        </div>
+                        <div class="preview-route">
+                            <span class="route-origin" id="route-origin">—</span>
+                            <div class="route-line">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </div>
+                            <span class="route-dest" id="route-dest">—</span>
+                        </div>
+                        <div class="preview-distances">
+                            <div class="preview-item">
+                                <span>Ida</span>
+                                <strong id="dist-oneway">0 km</strong>
+                            </div>
+                            <div class="preview-item">
+                                <span>Volta</span>
+                                <strong id="dist-return">0 km</strong>
+                            </div>
+                            <div class="preview-item total">
+                                <span>Total (ida e volta)</span>
+                                <strong id="dist-total">0 km</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btn-submit">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Salvar Viagem
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ========== HISTORY SECTION ========== -->
+        <section class="section section-history" id="section-history">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+                    Histórico de Viagens
+                </h2>
+                <p class="section-desc">Relatório cronológico de todas as viagens realizadas</p>
+            </div>
+
+            <div class="history-controls" id="history-controls">
+                <div class="filter-tabs">
+                    <button class="filter-btn active" data-filter="all" id="filter-all">Todos</button>
+                    <button class="filter-btn" data-filter="alberto" id="filter-alberto">Alberto</button>
+                    <button class="filter-btn" data-filter="arthur" id="filter-arthur">Arthur Vinícius</button>
+                </div>
+                <button class="btn-export" id="btn-export">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Exportar CSV
+                </button>
+            </div>
+
+            <div class="history-table-wrapper" id="history-table-wrapper">
+                <table class="history-table" id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Viajante</th>
+                            <th>Origem</th>
+                            <th>Destino</th>
+                            <th>Distância (ida/volta)</th>
+                            <th>Acumulado</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <!-- Dynamic rows -->
+                    </tbody>
+                </table>
+                <div class="empty-state" id="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <h3>Nenhuma viagem registrada</h3>
+                    <p>Registre a primeira viagem para começar a acompanhar a quilometragem.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Success Toast -->
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <span class="toast-message" id="toast-message">Viagem registrada com sucesso!</span>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal-box">
+            <div class="modal-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <h3>Confirmar Exclusão</h3>
+            <p>Deseja realmente excluir esta viagem? Esta ação não pode ser desfeita.</p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="modal-cancel">Cancelar</button>
+                <button class="modal-btn confirm" id="modal-confirm">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 Gestão Zênite · Grande Conselho Estadual da Ordem DeMolay para o Estado de Sergipe</p>
+    </footer>
+
+    <script src="distances.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
