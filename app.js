@@ -25,6 +25,7 @@ const STORAGE_KEY = "zenite_km_trips";
 let trips = loadTrips();
 let activeFilter = "all";
 let deleteTarget = null;
+let tripType = "ida-volta"; // "ida", "volta", "ida-volta"
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener("DOMContentLoaded", () => {
@@ -89,40 +90,55 @@ function switchSection(sectionId) {
 // ===== FORMULÁRIO =====
 function setupForm() {
     const form = document.getElementById("trip-form");
-    const travelerSelect = document.getElementById("traveler-select");
+    const originInput = document.getElementById("origin-input");
     const destInput = document.getElementById("destination-input");
-    const suggestionsEl = document.getElementById("suggestions-dropdown");
+    const originSuggestions = document.getElementById("origin-suggestions");
+    const destSuggestions = document.getElementById("destination-suggestions");
 
+    // Autocomplete de origem
+    setupCityAutocomplete(originInput, originSuggestions);
     // Autocomplete de destino
-    destInput.addEventListener("input", () => {
-        const query = destInput.value.trim();
-        const results = searchCities(query);
-        renderSuggestions(results, suggestionsEl, destInput);
-        updateDistancePreview();
+    setupCityAutocomplete(destInput, destSuggestions);
+
+    // Trip type toggle
+    document.querySelectorAll(".trip-type-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".trip-type-btn").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            tripType = btn.dataset.type;
+            updateDistancePreview();
+        });
     });
 
-    destInput.addEventListener("focus", () => {
-        const query = destInput.value.trim();
-        if (query.length >= 2) {
-            const results = searchCities(query);
-            renderSuggestions(results, suggestionsEl, destInput);
-        }
-    });
-
-    // Fechar dropdown ao clicar fora
+    // Fechar dropdowns ao clicar fora
     document.addEventListener("click", (e) => {
         if (!e.target.closest(".input-with-suggestions")) {
-            suggestionsEl.classList.remove("show");
+            originSuggestions.classList.remove("show");
+            destSuggestions.classList.remove("show");
         }
     });
-
-    // Atualiza preview quando muda o viajante
-    travelerSelect.addEventListener("change", updateDistancePreview);
 
     // Submit
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         handleFormSubmit();
+    });
+}
+
+function setupCityAutocomplete(input, suggestionsEl) {
+    input.addEventListener("input", () => {
+        const query = input.value.trim();
+        const results = searchCities(query);
+        renderSuggestions(results, suggestionsEl, input);
+        updateDistancePreview();
+    });
+
+    input.addEventListener("focus", () => {
+        const query = input.value.trim();
+        if (query.length >= 2) {
+            const results = searchCities(query);
+            renderSuggestions(results, suggestionsEl, input);
+        }
     });
 }
 
@@ -151,31 +167,29 @@ function renderSuggestions(cities, container, input) {
 let previewDebounce = null;
 
 function updateDistancePreview() {
-    const traveler = document.getElementById("traveler-select").value;
+    const origin = document.getElementById("origin-input").value.trim();
     const dest = document.getElementById("destination-input").value.trim();
     const preview = document.getElementById("distance-preview");
 
-    if (!traveler || !dest) {
+    if (!origin || !dest) {
         preview.classList.add("hidden");
         return;
     }
 
-    const user = USERS[traveler];
-
     // Tenta buscar localmente primeiro (síncrono)
-    const distOneWay = getRoadDistance(user.city, dest);
+    const distOneWay = getRoadDistance(origin, dest);
 
     if (distOneWay !== null) {
-        showDistancePreview(user.city, dest, distOneWay);
+        showDistancePreview(origin, dest, distOneWay);
         return;
     }
 
     // Se não encontrou, tenta assíncrono com debounce
     clearTimeout(previewDebounce);
     previewDebounce = setTimeout(async () => {
-        const asyncDist = await getRoadDistanceAsync(user.city, dest);
+        const asyncDist = await getRoadDistanceAsync(origin, dest);
         if (asyncDist !== null) {
-            showDistancePreview(user.city, dest, asyncDist);
+            showDistancePreview(origin, dest, asyncDist);
         } else {
             preview.classList.add("hidden");
         }
@@ -184,35 +198,66 @@ function updateDistancePreview() {
 
 function showDistancePreview(origin, dest, distOneWay) {
     const preview = document.getElementById("distance-preview");
-    const distRound = distOneWay * 2;
+    const distContainer = document.getElementById("preview-distances");
 
     document.getElementById("route-origin").textContent = origin;
     document.getElementById("route-dest").textContent = dest;
-    document.getElementById("dist-oneway").textContent = `${distOneWay} km`;
-    document.getElementById("dist-return").textContent = `${distOneWay} km`;
-    document.getElementById("dist-total").textContent = `${distRound} km`;
 
+    let totalDist;
+    let previewHTML = "";
+
+    if (tripType === "ida") {
+        totalDist = distOneWay;
+        previewHTML = `
+            <div class="preview-item total">
+                <span>Só Ida</span>
+                <strong>${distOneWay} km</strong>
+            </div>`;
+    } else if (tripType === "volta") {
+        totalDist = distOneWay;
+        previewHTML = `
+            <div class="preview-item total">
+                <span>Só Volta</span>
+                <strong>${distOneWay} km</strong>
+            </div>`;
+    } else {
+        totalDist = distOneWay * 2;
+        previewHTML = `
+            <div class="preview-item">
+                <span>Ida</span>
+                <strong>${distOneWay} km</strong>
+            </div>
+            <div class="preview-item">
+                <span>Volta</span>
+                <strong>${distOneWay} km</strong>
+            </div>
+            <div class="preview-item total">
+                <span>Total (ida e volta)</span>
+                <strong>${totalDist} km</strong>
+            </div>`;
+    }
+
+    distContainer.innerHTML = previewHTML;
     preview.classList.remove("hidden");
 }
 
 async function handleFormSubmit() {
     const travelerId = document.getElementById("traveler-select").value;
     const date = document.getElementById("trip-date").value;
+    const origin = document.getElementById("origin-input").value.trim();
     const dest = document.getElementById("destination-input").value.trim();
     const submitBtn = document.getElementById("btn-submit");
 
-    if (!travelerId || !date || !dest) return;
-
-    const user = USERS[travelerId];
+    if (!travelerId || !date || !origin || !dest) return;
 
     // Tenta síncrono primeiro
-    let distOneWay = getRoadDistance(user.city, dest);
+    let distOneWay = getRoadDistance(origin, dest);
 
     // Se não encontrou, tenta assíncrono
     if (distOneWay === null) {
         submitBtn.disabled = true;
         submitBtn.textContent = "Calculando distância...";
-        distOneWay = await getRoadDistanceAsync(user.city, dest);
+        distOneWay = await getRoadDistanceAsync(origin, dest);
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Salvar Viagem`;
     }
@@ -222,14 +267,19 @@ async function handleFormSubmit() {
         return;
     }
 
+    // Calcula distância total baseada no tipo de trajeto
+    const multiplier = tripType === "ida-volta" ? 2 : 1;
+    const distTotal = distOneWay * multiplier;
+
     const trip = {
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
         travelerId,
         date,
-        origin: user.city,
+        origin: origin,
         destination: dest,
+        tripType: tripType,
         distanceOneWay: distOneWay,
-        distanceTotal: distOneWay * 2,
+        distanceTotal: distTotal,
         createdAt: new Date().toISOString(),
     };
 
@@ -240,6 +290,10 @@ async function handleFormSubmit() {
     // Reset form
     document.getElementById("trip-form").reset();
     document.getElementById("distance-preview").classList.add("hidden");
+    // Reset trip type to ida-volta
+    tripType = "ida-volta";
+    document.querySelectorAll(".trip-type-btn").forEach((b) => b.classList.remove("active"));
+    document.querySelector('.trip-type-btn[data-type="ida-volta"]').classList.add("active");
     setDefaultDate();
 
     showToast("Viagem registrada com sucesso!");
@@ -337,12 +391,15 @@ function renderHistory() {
     tbody.innerHTML = filtered
         .map((t) => {
             const user = USERS[t.travelerId];
+            const typeLabel = getTripTypeLabel(t.tripType);
+            const typeClass = getTripTypeClass(t.tripType);
             return `
             <tr>
                 <td>${formatDate(t.date)}</td>
                 <td><span class="traveler-tag ${t.travelerId}">${user.name}</span></td>
                 <td>${t.origin}</td>
                 <td>${t.destination}</td>
+                <td><span class="trip-type-tag ${typeClass}">${typeLabel}</span></td>
                 <td class="km-highlight">${t.distanceTotal.toLocaleString("pt-BR")} km</td>
                 <td>${accumulatedMap[t.id].toLocaleString("pt-BR")} km</td>
                 <td><button class="btn-delete" onclick="confirmDelete('${t.id}')">Excluir</button></td>
@@ -395,14 +452,15 @@ function exportCSV() {
     }
 
     const sorted = [...trips].sort((a, b) => a.date.localeCompare(b.date));
-    const headers = "Data,Viajante,Origem,Destino,Distância (km),Acumulado (km)\n";
+    const headers = "Data,Viajante,Origem,Destino,Tipo,Distância (km),Acumulado (km)\n";
     const runningTotals = {};
 
     const rows = sorted.map((t) => {
         const user = USERS[t.travelerId];
         if (!runningTotals[t.travelerId]) runningTotals[t.travelerId] = 0;
         runningTotals[t.travelerId] += t.distanceTotal;
-        return `${formatDate(t.date)},${user.name},${t.origin},${t.destination},${t.distanceTotal},${runningTotals[t.travelerId]}`;
+        const typeLabel = getTripTypeLabel(t.tripType);
+        return `${formatDate(t.date)},${user.name},${t.origin},${t.destination},${typeLabel},${t.distanceTotal},${runningTotals[t.travelerId]}`;
     });
 
     const csv = "\uFEFF" + headers + rows.join("\n");
@@ -417,6 +475,18 @@ function exportCSV() {
 }
 
 // ===== UTILITÁRIOS =====
+function getTripTypeLabel(type) {
+    if (type === "ida") return "Só Ida";
+    if (type === "volta") return "Só Volta";
+    return "Ida e Volta";
+}
+
+function getTripTypeClass(type) {
+    if (type === "ida") return "type-ida";
+    if (type === "volta") return "type-volta";
+    return "type-ida-volta";
+}
+
 function formatDate(dateStr) {
     const [y, m, d] = dateStr.split("-");
     return `${d}/${m}/${y}`;

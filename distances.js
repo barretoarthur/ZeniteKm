@@ -265,10 +265,30 @@ async function getRoadDistanceAsync(originName, destName) {
         (c) => normalizeStr(c.name) === normalizeStr(destName)
     );
 
+    const allCities = ibgeCitiesCache || LOCAL_CITIES;
+
+    // Se não encontrou origem, tenta geocodificar
+    if (!origin || !origin.lat) {
+        const ibgeCity = allCities.find(
+            (c) => normalizeStr(c.name) === normalizeStr(originName)
+        );
+        const state = ibgeCity ? ibgeCity.state : "";
+
+        const coords = await geocodeCity(originName, state);
+        if (coords) {
+            const newCity = {
+                name: originName,
+                state: state,
+                lat: coords.lat,
+                lon: coords.lon,
+            };
+            LOCAL_CITIES.push(newCity);
+            origin = newCity;
+        }
+    }
+
     // Se não encontrou destino, tenta geocodificar
     if (!dest || !dest.lat) {
-        // Busca na lista IBGE para pegar o estado
-        const allCities = ibgeCitiesCache || LOCAL_CITIES;
         const ibgeCity = allCities.find(
             (c) => normalizeStr(c.name) === normalizeStr(destName)
         );

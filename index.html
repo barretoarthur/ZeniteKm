@@ -191,14 +191,52 @@
                         <input type="date" id="trip-date" required>
                     </div>
 
+                    <div class="form-route-group">
+                        <div class="form-group">
+                            <label for="origin-input" class="form-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                                Ponto de Ida (Origem)
+                            </label>
+                            <div class="input-with-suggestions">
+                                <input type="text" id="origin-input" placeholder="Digite a cidade de origem..." required autocomplete="off">
+                                <div class="suggestions-dropdown" id="origin-suggestions"></div>
+                            </div>
+                        </div>
+
+                        <div class="route-arrow-separator">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7l5-5 5 5M7 17l5 5 5-5M12 2v20"/></svg>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="destination-input" class="form-label">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                Ponto de Volta (Destino)
+                            </label>
+                            <div class="input-with-suggestions">
+                                <input type="text" id="destination-input" placeholder="Digite a cidade de destino..." required autocomplete="off">
+                                <div class="suggestions-dropdown" id="destination-suggestions"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
-                        <label for="destination-input" class="form-label">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            Cidade de Destino
+                        <label class="form-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            Tipo de Trajeto
                         </label>
-                        <div class="input-with-suggestions">
-                            <input type="text" id="destination-input" placeholder="Digite a cidade de destino..." required autocomplete="off">
-                            <div class="suggestions-dropdown" id="suggestions-dropdown"></div>
+                        <div class="trip-type-toggle" id="trip-type-toggle">
+                            <button type="button" class="trip-type-btn" data-type="ida">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                Só Ida
+                            </button>
+                            <button type="button" class="trip-type-btn" data-type="volta">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                Só Volta
+                            </button>
+                            <button type="button" class="trip-type-btn active" data-type="ida-volta">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18"/></svg>
+                                Ida e Volta
+                            </button>
                         </div>
                     </div>
 
@@ -215,19 +253,8 @@
                             </div>
                             <span class="route-dest" id="route-dest">—</span>
                         </div>
-                        <div class="preview-distances">
-                            <div class="preview-item">
-                                <span>Ida</span>
-                                <strong id="dist-oneway">0 km</strong>
-                            </div>
-                            <div class="preview-item">
-                                <span>Volta</span>
-                                <strong id="dist-return">0 km</strong>
-                            </div>
-                            <div class="preview-item total">
-                                <span>Total (ida e volta)</span>
-                                <strong id="dist-total">0 km</strong>
-                            </div>
+                        <div class="preview-distances" id="preview-distances">
+                            <!-- Dynamic based on trip type -->
                         </div>
                     </div>
 
@@ -269,7 +296,8 @@
                             <th>Viajante</th>
                             <th>Origem</th>
                             <th>Destino</th>
-                            <th>Distância (ida/volta)</th>
+                            <th>Tipo</th>
+                            <th>Distância</th>
                             <th>Acumulado</th>
                             <th>Ações</th>
                         </tr>
