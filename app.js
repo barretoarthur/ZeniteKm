@@ -19,22 +19,29 @@ const USERS = {
     },
 };
 
-const STORAGE_KEY = "zenite_km_trips";
-
 // ===== STATE =====
-let trips = loadTrips();
+let trips = [];
 let activeFilter = "all";
 let deleteTarget = null;
 let tripType = "ida-volta"; // "ida", "volta", "ida-volta"
 
 // ===== INICIALIZAÇÃO =====
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     generateStars();
     setupNavigation();
     setupForm();
     setupHistory();
-    renderAll();
     setDefaultDate();
+
+    // Migra dados do localStorage para Firebase (apenas na primeira vez)
+    await migrateLocalStorageToFirebase();
+
+    // Inicia listener em tempo real — atualiza a UI automaticamente
+    // quando qualquer usuário (de qualquer dispositivo) altera os dados
+    firebaseListenTrips((updatedTrips) => {
+        trips = updatedTrips;
+        renderAll();
+    });
 });
 
 // ===== STAR BACKGROUND =====
@@ -272,7 +279,6 @@ async function handleFormSubmit() {
     const distTotal = distOneWay * multiplier;
 
     const trip = {
-        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
         travelerId,
         date,
         origin: origin,
@@ -283,23 +289,26 @@ async function handleFormSubmit() {
         createdAt: new Date().toISOString(),
     };
 
-    trips.push(trip);
-    saveTrips();
-    renderAll();
+    try {
+        await firebaseSaveTrip(trip);
+        // O listener do Firebase vai atualizar a UI automaticamente
 
-    // Reset form
-    document.getElementById("trip-form").reset();
-    document.getElementById("distance-preview").classList.add("hidden");
-    // Reset trip type to ida-volta
-    tripType = "ida-volta";
-    document.querySelectorAll(".trip-type-btn").forEach((b) => b.classList.remove("active"));
-    document.querySelector('.trip-type-btn[data-type="ida-volta"]').classList.add("active");
-    setDefaultDate();
+        // Reset form
+        document.getElementById("trip-form").reset();
+        document.getElementById("distance-preview").classList.add("hidden");
+        // Reset trip type to ida-volta
+        tripType = "ida-volta";
+        document.querySelectorAll(".trip-type-btn").forEach((b) => b.classList.remove("active"));
+        document.querySelector('.trip-type-btn[data-type="ida-volta"]').classList.add("active");
+        setDefaultDate();
 
-    showToast("Viagem registrada com sucesso!");
+        showToast("Viagem registrada com sucesso!");
 
-    // Animate counter
-    animateCounter(travelerId);
+        // Animate counter
+        animateCounter(travelerId);
+    } catch (err) {
+        showToast("Erro ao salvar viagem. Tente novamente.", true);
+    }
 }
 
 function setDefaultDate() {
@@ -307,19 +316,10 @@ function setDefaultDate() {
     dateInput.value = new Date().toISOString().split("T")[0];
 }
 
-// ===== PERSISTÊNCIA =====
-function loadTrips() {
-    try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
-    } catch {
-        return [];
-    }
-}
-
-function saveTrips() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
-}
+// ===== PERSISTÊNCIA (FIREBASE) =====
+// A persistência agora é gerenciada pelo Firebase Realtime Database
+// O listener em firebaseListenTrips() mantém o array 'trips' sincronizado
+// As funções firebaseSaveTrip() e firebaseDeleteTrip() estão em firebase-config.js
 
 // ===== RENDERIZAÇÃO =====
 function renderAll() {
@@ -419,12 +419,15 @@ document.getElementById("modal-cancel").addEventListener("click", () => {
     deleteTarget = null;
 });
 
-document.getElementById("modal-confirm").addEventListener("click", () => {
+document.getElementById("modal-confirm").addEventListener("click", async () => {
     if (deleteTarget) {
-        trips = trips.filter((t) => t.id !== deleteTarget);
-        saveTrips();
-        renderAll();
-        showToast("Viagem excluída.");
+        try {
+            await firebaseDeleteTrip(deleteTarget);
+            // O listener do Firebase vai atualizar a UI automaticamente
+            showToast("Viagem excluída.");
+        } catch (err) {
+            showToast("Erro ao excluir viagem. Tente novamente.", true);
+        }
     }
     document.getElementById("delete-modal").classList.remove("show");
     deleteTarget = null;
